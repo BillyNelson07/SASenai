@@ -1,12 +1,14 @@
 import dotenv from "dotenv";
 import { GoogleGenAI } from "@google/genai";
 
-export const gerar = async (req, res) => {
+export const gerarPlanoDeEnsino = async (req, res) => {
   dotenv.config(); // Carrega variáveis do .env
   try {
     const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_KEY });
     const { tipo, dificuldade } = req.body;
 
+    //refatorar essa parte para pegar a trilha do banco de dados, por enquanto está hardcoded
+    //mas fazer novo arquivo que a ia receberá parametros para gerar uma nova trilha de acordo com o que o usuário deseja aprender
     const trilha = {
       titulo: "Formação JavaScript Avançado e Assíncrono",
       descricao:
