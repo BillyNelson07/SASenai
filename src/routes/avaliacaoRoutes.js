@@ -1,8 +1,7 @@
 import { Router } from "express";
-import { gerarAvaliacao } from "../controllers/avaliacaoDiagnosticaController.js";
+import { gerarAvaliacaoDiagnostica } from "../controllers/avaliacaoDiagnosticaController.js";
 
 const router = Router();
 
-router.post("/api", gerarAvaliacao);
-
+router.post("/diagnostic", gerarAvaliacaoDiagnostica);
 export default router;

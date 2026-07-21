@@ -1,78 +1,19 @@
 import dotenv from "dotenv";
 import { GoogleGenAI } from "@google/genai";
+import TrilhaDeEnsino from "../db/models/TrilhaDeEnsino.js";
+import AvaliacaoDiagnostica from "../db/models/AvaliacaoDiagnostica.js";
 
-export const gerarAvaliacao = async (req, res) => {
+export const gerarAvaliacaoDiagnostica = async (req, res) => {
   dotenv.config(); // Carrega variáveis do .env
   try {
     const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_KEY });
-    const { tipo, dificuldade } = req.body;
+    const { id, tipo, dificuldade } = req.body;
 
-    //refatorar essa parte para pegar a trilha do banco de dados, por enquanto está hardcoded
-    //mas fazer novo arquivo que a ia receberá parametros para gerar uma nova trilha de acordo com o que o usuário deseja aprender
-    const trilha = {
-      titulo: "Formação JavaScript Avançado e Assíncrono",
-      descricao:
-        "Trilha completa para dominar JavaScript do zero ao avançado, focando em conceitos modernos da linguagem, manipulação do DOM, requisições a APIs e arquitetura de código para o mercado de trabalho.",
-      competencias: [
-        "Resolução de problemas lógicos utilizando algoritmos estruturados em JavaScript.",
-        "Desenvolvimento de interfaces web dinâmicas e interativas com manipulação eficiente do DOM.",
-        "Integração de aplicações web com serviços e APIs externas de forma assíncrona.",
-        "Aplicação de boas práticas de programação e padrões de projeto modernos (ES6+).",
-      ],
-      habilidades: [
-        "Criar e manipular estruturas de dados complexas como arrays e objetos.",
-        "Tratar eventos gerados pelo usuário em páginas web.",
-        "Consumir APIs REST utilizando Fetch API e Axios.",
-        "Gerenciar o fluxo assíncrono de dados com Promises e Async/Await.",
-        "Modularizar código javascript para reutilização e manutenção.",
-      ],
-      topicos: [
-        {
-          nome: "Fundamentos da Linguagem",
-          aulas: [
-            "Variáveis (let, const) e Escopo",
-            "Tipos de Dados e Operadores",
-            "Estruturas Condicionais (if, switch)",
-            "Laços de Repetição (for, while)",
-          ],
-        },
-        {
-          nome: "JavaScript Moderno (ES6+)",
-          aulas: [
-            "Arrow Functions",
-            "Desestruturação (Destructuring)",
-            "Operadores Rest e Spread",
-            "Métodos de Array (map, filter, reduce)",
-          ],
-        },
-        {
-          nome: "Manipulação de DOM",
-          aulas: [
-            "Seleção de Elementos",
-            "Eventos e Event Listeners",
-            "Modificação de Estilos e Classes CSS",
-            "Criação Dinâmica de Elementos HTML",
-          ],
-        },
-        {
-          nome: "Programação Assíncrona",
-          aulas: [
-            "Event Loop e Callbacks",
-            "Trabalhando com Promises",
-            "Async e Await",
-            "Tratamento de Erros (try/catch)",
-          ],
-        },
-        {
-          nome: "Comunicação com APIs",
-          aulas: [
-            "Protocolo HTTP e Métodos (GET, POST)",
-            "Requisições com Fetch API",
-            "Formato JSON e Parsing de Dados",
-          ],
-        },
-      ],
-    };
+    const trilha = await TrilhaDeEnsino.findOne({
+      where: { id: req.body.id },
+    });
+
+    console.log("Trilha: ", trilha);
 
     const system =
       "Você é um avaliador pedagógico. Gere avaliações em JSON estrito, sem texto fora do JSON. " +
@@ -92,16 +33,20 @@ export const gerarAvaliacao = async (req, res) => {
 
     console.log(user);
 
-    const novaAvaliacao = await ai.models.generateContent({
+    const gerarAvaliacao = await ai.models.generateContent({
       model: "gemini-3.5-flash",
       contents: system + user,
     });
 
-    console.log(novaAvaliacao.text);
+    console.log(gerarAvaliacao.text);
+
+    const novaAvaliacao = await AvaliacaoDiagnostica.create({
+      questoes: JSON.parse(gerarAvaliacao.text).questoes,
+    });
 
     res.status(200).json({
       mensagem: "Avaliação criada com sucesso",
-      avaliacao: novaAvaliacao.text,
+      avaliacao: novaAvaliacao,
     });
   } catch (err) {
     // Em caso de erro, retorna erro 400

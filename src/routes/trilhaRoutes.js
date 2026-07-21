@@ -3,6 +3,6 @@ import { gerarTrilhaDeEnsino } from "../controllers/trilhaController.js";
 
 const router = Router();
 
-router.post("/api", gerarTrilhaDeEnsino);
+router.post("/trilha", gerarTrilhaDeEnsino);
 
 export default router;
