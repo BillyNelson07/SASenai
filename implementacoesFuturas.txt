@@ -1,0 +1,3 @@
+adicionar mais rotas para trilhas de ensino
+
+melhorar a integracao com swagger(adicionar body, params, etc)
