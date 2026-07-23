@@ -1,3 +1,4 @@
 adicionar mais rotas para trilhas de ensino
-
+schemas de todas as tabelas com zod
+separar responsabilidades no controller(adicionar services)
 melhorar a integracao com swagger(adicionar body, params, etc)

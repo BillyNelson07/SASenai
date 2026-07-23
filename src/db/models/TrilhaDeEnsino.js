@@ -15,7 +15,7 @@ const TrilhaDeEnsino = sequelize.define(
       allowNull: false,
     },
     descricao: {
-      type: DataTypes.TEXT, // Usamos TEXT pois descrições costumam ser longas
+      type: DataTypes.STRING, // Usamos TEXT pois descrições costumam ser longas
       allowNull: true,
     },
     competencias: {
